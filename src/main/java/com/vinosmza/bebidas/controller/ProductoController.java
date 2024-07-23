@@ -1,6 +1,8 @@
 package com.vinosmza.bebidas.controller;
 
 import com.vinosmza.bebidas.model.Producto;
+import com.vinosmza.bebidas.repository.ProductoRepository;
+import com.vinosmza.bebidas.services.CloudinaryService;
 import com.vinosmza.bebidas.services.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -10,15 +12,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/productos")
 public class ProductoController {
     @Autowired
     private ProductoService productoServ;
+    @Autowired
+    private ProductoRepository productoRepo;
+    @Autowired
+    private CloudinaryService cloudinaryServ;
 
     @GetMapping
     public List<Producto> traerProducto() {
@@ -38,9 +46,12 @@ public class ProductoController {
             @RequestParam("varietal") String varietal,
             @RequestParam("categoria") String categoria,
             @RequestParam("imagen") MultipartFile imagen
-    ) {
-        Producto producto = new Producto(nombre, precio, bodega, varietal, categoria);
-        return productoServ.createProducto(producto, imagen);
+    )throws IOException {
+        Map uploadResult = cloudinaryServ.upload(imagen);
+        String imagenUrl = (String) uploadResult.get("url");
+        String imagenPublicId = (String) uploadResult.get("public_id");
+        Producto producto = new Producto(nombre, precio, bodega, varietal, categoria, imagenUrl, imagenPublicId);
+        return productoRepo.save(producto);
     }
 
     @PutMapping("/{id}")
@@ -61,14 +72,22 @@ public class ProductoController {
         productoExistente.setCategoria(categoria);
         return productoServ.updateProducto(productoExistente, imagen);
     }
-//        Producto productoExistente = productoServ.getProductoById(id);
-//        if(productoExistente != null && (imagen == null || imagen.isEmpty())) {
-//            producto.setImagen(productoExistente.getImagen());
-//        }
-
 
     @DeleteMapping("/{id}")
     public void eliminarProducto(@PathVariable Long id) {
+        Producto producto = productoServ.getProductoById(id);
+        if(producto == null) {
+            throw new RuntimeException("Producto no encontrado.");
+        }
+
+        //Eliminar la imagen de Cloudinary si el publicId está presente
+        if(producto.getImagenPublicId() != null) {
+            try {
+                cloudinaryServ.delete(producto.getImagenPublicId());
+            } catch(Exception e) {
+                throw new RuntimeException("Error al eliminar la imagen de cloudinary", e);
+            }
+        }
         productoServ.deleteProducto(id);
     }
 

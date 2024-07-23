@@ -10,26 +10,19 @@ public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nombre, imagen, bodega, varietal, categoria;
+    private String nombre, imagenUrl, imagenPublicId, bodega, varietal, categoria;
     private double precio;
 
     public Producto() {}
 
-    public Producto(String nombre, String imagen, String bodega, String varietal, String categoria, double precio) {
-        this.nombre = nombre;
-        this.imagen = imagen;
-        this.bodega = bodega;
-        this.varietal = varietal;
-        this.categoria = categoria;
-        this.precio = precio;
-    }
-
-    public Producto(String nombre, double precio, String bodega, String varietal, String categoria) {
+    public Producto(String nombre, double precio, String bodega, String varietal, String categoria, String imagenUrl, String imagenPublicId) {
         this.nombre = nombre;
         this.bodega = bodega;
         this.varietal = varietal;
         this.categoria = categoria;
         this.precio = precio;
+        this.imagenUrl = imagenUrl;
+        this.imagenPublicId = imagenPublicId;
     }
 
     public Long getId() {
@@ -48,12 +41,20 @@ public class Producto {
         this.nombre = nombre;
     }
 
-    public String getImagen() {
-        return imagen;
+    public String getImagenUrl() {
+        return imagenUrl;
     }
 
-    public void setImagen(String imagen) {
-        this.imagen = imagen;
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
+    }
+
+    public String getImagenPublicId() {
+        return imagenPublicId;
+    }
+
+    public void setImagenPublicId(String imagenPublicId) {
+        this.imagenPublicId = imagenPublicId;
     }
 
     public String getBodega() {

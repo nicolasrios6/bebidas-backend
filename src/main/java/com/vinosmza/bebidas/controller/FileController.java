@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-@RestController
+/*@RestController
 @RequestMapping("/uploads")
 public class FileController {
     private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/";
@@ -34,4 +34,4 @@ public class FileController {
             return ResponseEntity.internalServerError().build();
         }
     }
-}
+}*/
